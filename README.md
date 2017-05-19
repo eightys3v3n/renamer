@@ -1,4 +1,4 @@
-Renames files en-mass using regular expressions. Written in Python 3
+Renames files in mass using regular expressions. Written in Python 3
 
 
 # Help Text
@@ -37,8 +37,7 @@ Renamed files:
 ```
 
 
-# An example
-## First
+# Example
 ### Given the following files:
 ```
   ./"series_name episode 1 [hello world] first_ep_title.mp4"
