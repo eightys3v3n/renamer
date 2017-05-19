@@ -37,7 +37,8 @@ Renamed files:
 ```
 
 
-# An example
+An example
+==========
 ```
 ## Given the following files:
   ./"series_name episode 1 [hello world] first_ep_title.mp4"
