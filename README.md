@@ -37,16 +37,15 @@ Renamed files:
 ```
 
 
-An example
-==========
-```
+# An example
 ## Given the following files:
   ./"series_name episode 1 [hello world] first_ep_title.mp4"
   ...
   ./"series_name episode 34 [hello world] fourth_ep_title.mp4"
 
-
+```
 rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Series Name' *
+```
 
 ## Files:
   ./"Series Name episode 1 [hello world] first_ep_title.mp4"
