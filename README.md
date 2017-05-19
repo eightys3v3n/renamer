@@ -38,7 +38,8 @@ Renamed files:
 
 
 # An example
-## Given the following files:
+## First
+### Given the following files:
 ```
   ./"series_name episode 1 [hello world] first_ep_title.mp4"
   ...
@@ -49,7 +50,7 @@ Renamed files:
 rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Series Name' *
 ```
 
-## Files:
+### Files:
 ```
   ./"Series Name episode 1 [hello world] first_ep_title.mp4"
   ...
@@ -61,15 +62,3 @@ rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Seri
 -r files can only be renamed to something matching this regex
 -a an action to do on all the file names. In this case it is replacing series_name with Series Name.
 ```
-
-
-rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Series Name' *
-
-## Files:
-  ./"Series Name episode 1 [hello world] first_ep_title.mp4"
-  ...
-  ./"Series Name episode 34 [hello world] fourth_ep_title.mp4"
-
-
-
--a 'r:episode ([0-9]):E\1' -a 'r: \[hello world\] (.*)\.mp4'
