@@ -1,7 +1,7 @@
 Renames files en-mass using regular expressions. Written in Python 3
 
 
-Help Text
+# Help Text
 ```
 rename <options> file_one file_two ...
 renames files based on python regular expressions
@@ -37,26 +37,33 @@ Renamed files:
 ```
 
 
-An example
+# An example
 ```
-Given the file system structure:
+## Given the following files:
   ./"series_name episode 1 [hello world] first_ep_title.mp4"
   ...
   ./"series_name episode 34 [hello world] fourth_ep_title.mp4"
 
 
-The -a argument adds an 'action' to be done to the file names. Actions are done in the order that you put them in the command.
-
 rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Series Name' *
 
-Files:
+## Files:
   ./"Series Name episode 1 [hello world] first_ep_title.mp4"
   ...
   ./"Series Name episode 34 [hello world] fourth_ep_title.mp4"
 
 -f only files matching the following regex will be renamed
 -r files can only be renamed to something matching this regex
--a an action to do on all the file names.
+-a an action to do on all the file names. In this case it is replacing series_name with Series Name.
+
+
+
+rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Series Name' *
+
+## Files:
+  ./"Series Name episode 1 [hello world] first_ep_title.mp4"
+  ...
+  ./"Series Name episode 34 [hello world] fourth_ep_title.mp4"
 
 
 
