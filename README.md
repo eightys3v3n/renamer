@@ -43,7 +43,7 @@ Renamed files:
 ```
   ./"series_name episode 1 [hello world] first_ep_title.mp4"
   ...
-  ./"series_name episode 34 [hello world] fourth_ep_title.mp4"
+  ./"series_name episode 34 [hello world] thirty_fourth_ep_title.mp4"
 ```
 
 ```
@@ -54,7 +54,7 @@ rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Seri
 ```
   ./"Series Name episode 1 [hello world] first_ep_title.mp4"
   ...
-  ./"Series Name episode 34 [hello world] fourth_ep_title.mp4"
+  ./"Series Name episode 34 [hello world] thirty_fourth_ep_title.mp4"
 ```
 
 ```
