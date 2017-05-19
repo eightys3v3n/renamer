@@ -56,10 +56,11 @@ rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Seri
   ./"Series Name episode 34 [hello world] fourth_ep_title.mp4"
 ```
 
+```
 -f only files matching the following regex will be renamed
 -r files can only be renamed to something matching this regex
 -a an action to do on all the file names. In this case it is replacing series_name with Series Name.
-
+```
 
 
 rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Series Name' *
