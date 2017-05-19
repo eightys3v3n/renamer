@@ -35,3 +35,29 @@ Renamed files:
    'Dexter E2.mp4'
    'Dexter E3.mp4'
 ```
+
+
+An example
+```
+Given the file system structure:
+  ./"series_name episode 1 [hello world] first_ep_title.mp4"
+  ...
+  ./"series_name episode 34 [hello world] fourth_ep_title.mp4"
+
+
+The -a argument adds an 'action' to be done to the file names. Actions are done in the order that you put them in the command.
+
+rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Series Name' *
+
+Files:
+  ./"Series Name episode 1 [hello world] first_ep_title.mp4"
+  ...
+  ./"Series Name episode 34 [hello world] fourth_ep_title.mp4"
+
+-f only files matching the following regex will be renamed
+-r files can only be renamed to something matching this regex
+-a an action to do on all the file names.
+
+
+
+-a 'r:episode ([0-9]):E\1' -a 'r: \[hello world\] (.*)\.mp4'
