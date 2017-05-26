@@ -2,11 +2,12 @@
 
 
 """
-Written by Terrence @ eightys3v3n@gmail.com
+  Written by Terrence = eightys3v3n@gmail.com
 """
 
 
 from getopt import getopt
+import keyword_replacer
 import unittest
 import textwrap
 import shutil
@@ -108,7 +109,7 @@ def ParseAction( raw ):
   return tuple( action )
 
 
-def DoAction( action, file ):
+def DoAction( action, file, partial=False ):
   """
   Does the specified action to the file name.
 
@@ -124,20 +125,20 @@ def DoAction( action, file ):
     # didn't see a remove function so actually just replacing with nothing
     new_file = re.sub( action[1], '', file )
 
-    # if the file name didn't change, return None so the calling function can deal with it
-    if new_file == file:
+    if not partial and new_file == file:
       return None
 
   # same as above but replace some bits
   elif action[0] == 'replace':
     new_file = re.sub( action[1], action[2], file )
-    if new_file == file:
+
+    if not partial and new_file == file:
       return None
 
   return new_file
 
 
-def GenerateRename( actions, file ):
+def GenerateRename( actions, file, partial=False ):
   """
   Performs a list of actions on a file name.
 
@@ -149,17 +150,19 @@ def GenerateRename( actions, file ):
   new_file = file
 
   for action in actions:
-    new_file = DoAction( action, new_file )
+    new_file = DoAction( action, new_file, partial=partial )
 
     # if the action didn't change the file name let the calling function deal with it.
     # stops on first failed action to prevent renaming things you didn't intend to in a wierd way.
     if new_file is None:
       return None
 
+  new_file = keyword_replacer.ReplaceKeyWords( new_file, file )
+
   return ( file, new_file )
 
 
-def GenerateRenames( actions, files ):
+def GenerateRenames( actions, files, partial=False ):
   """
   Performs a list of actions on a list of file names.
 
@@ -173,7 +176,7 @@ def GenerateRenames( actions, files ):
 
   for file in files:
     # generate ( original_file_name, new_file_name )
-    rename = GenerateRename( actions, file )
+    rename = GenerateRename( actions, file, partial=partial )
 
     # if the new file name is the same as the old,
     # don't touch that file.
@@ -309,7 +312,8 @@ def PrintHelp():
     [ '-d' , '--dryrun'  , "prints what renames would happen without doing them." ]                            ,
     [ '-f' , '--filter=' , "only works with files that match this regex." ]                                    ,
     [ '-r' , '--result=' , "only performs renames that result in a file that matches this regex." ]            ,
-    [ '-a' , '--action=' , "add an action to be performed on file names. actions are done in the order they are specified. (see actions)"],
+    [ '-a' , '--action=' , "add an action to be performed on file names. actions are done in the order they are specified. (see actions)" ],
+    [ '-p' , '--partial' , "allows for only some of the specified actions to be applied to file names" ],
   ]
 
   AlignOptions( options )
@@ -339,12 +343,15 @@ def Main():
   global verbose
 
   # parse the command line options and arguments
-  opts, args = getopt( sys.argv[1:], 'hvdf:r:a:', [ 'help', 'verbose', 'dryrun', 'filter=', 'result=', 'action=' ] )
+  opts, args = getopt( sys.argv[1:], 'hvdf:r:a:p', [ 'help', 'verbose', 'dryrun', 'filter=', 'result=', 'action=', 'partial' ] )
   filter_re  = None
   actions    = []
   dryrun     = False
   result_re  = None
+  command    = None
+  partial    = False
 
+  # parse command line arguments
   for opt, arg in opts:
     if opt in [ '-h', '--help' ]:
       PrintHelp()
@@ -372,10 +379,20 @@ def Main():
       # add ( action_type, action_arguments... ) to actions
       actions.append( ParseAction( arg ) )
 
+    elif opt in [ '-p', '--partial' ]:
+      partial = True
+
+
   # get the files that will be worked with
   files   = GetFiles( args, filter_re=filter_re )
   if len( files ) == 0:
     raise Exception( "no files specified" )
+
+
+  # print errors if required arguments are missing
+  if len(actions) == 0:
+    raise Exception( "no actions to do" )
+
 
   # print the files we will work with, if verbose is on
   if verbose:
@@ -383,11 +400,10 @@ def Main():
     for file in files:
       print( "  "+file )
 
-  if len(actions) == 0:
-    raise Exception( "no actions to do" )
 
   # generate a list of ( original_file_name, new_file_name )
-  renames = GenerateRenames( actions, files )
+  renames = GenerateRenames( actions, files, partial=partial )
+
 
   # filter out renames whose new_file_name doesn't match the result expression
   if result_re is not None:
