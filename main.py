@@ -5,15 +5,18 @@
   Written by Terrence = eightys3v3n@gmail.com
 """
 
-
 from getopt import getopt
-import keyword_replacer
+
 import unittest
 import textwrap
 import shutil
 import sys
 import os
 import re
+
+sys.path.append( '/data/source/db' )
+
+import keyword_replacer
 
 
 global verbose, true, false
@@ -103,6 +106,32 @@ def ParseAction( raw ):
 
     action.extend( res )
 
+  elif raw[0:2] == 'i:':
+    action[0] = 'insert'
+    raw = raw[2:]
+
+    res = re.split( '(?<!\\\):', raw )
+
+    if len(res) == 1:
+      action.extend( [ 0, res[0] ] )
+
+    elif len(res) == 2:
+      try:
+        i = int( res[0] )
+      except ValueError:
+        raise Exception( "in 'i:int:abc' int must be a signed integer", res[0] )
+
+      action.extend( [ i, res[1] ] )
+
+    else:
+      raise Exception( "too many seperators ':'", raw )
+
+  elif raw[0:2] == 'a:':
+    action[0] = 'append'
+    raw = raw[2:]
+
+    action.append( raw )
+
   else:
     raise Exception( "invalid action", raw[0:2] )
 
@@ -120,7 +149,7 @@ def DoAction( action, file, partial=False ):
   """
   new_file = None
 
-  # remove some bits
+  # remove some stuff
   if action[0] == 'remove':
     # didn't see a remove function so actually just replacing with nothing
     new_file = re.sub( action[1], '', file )
@@ -128,12 +157,45 @@ def DoAction( action, file, partial=False ):
     if not partial and new_file == file:
       return None
 
-  # same as above but replace some bits
+  # same as above but replace some stuff
   elif action[0] == 'replace':
     new_file = re.sub( action[1], action[2], file )
 
     if not partial and new_file == file:
       return None
+
+  # inserts new stuff at position action[1]
+  elif action[0] == 'insert':
+    # if the insert position is outside of the file name
+    if action[1] > 0:
+      if action[1] >= len( file ):
+        new_file = file
+    else:
+      if action[1]*-1 >= len( file ):
+        new_file = file
+
+    # if the insert position is a real position in the file name, insert the stuff there
+    if new_file is None:
+      prefix = file[ 0:action[1] ]
+      suffix = file[ action[1]: ]
+      new_file = prefix + action[2] + suffix
+
+    if not partial and new_file == file:
+      return None
+
+  # append new stuff at the end
+  elif action[0] == 'append':
+    ext_i = file.rfind( os.path.extsep )
+    extension = ''
+
+    # append after the file name, before the extension
+    if ext_i < 0:
+      new_file = file
+    else:
+      extension = file[ ext_i: ]
+      new_file  = file[ 0 : ext_i ]
+
+    new_file += action[1] + extension
 
   return new_file
 

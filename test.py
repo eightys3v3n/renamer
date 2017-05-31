@@ -90,6 +90,62 @@ class TestParseAction( unittest.TestCase ):
     self.assertEqual( action, ( 'replace', 'lang.*:eng.*', 'eng' ) )
 
 
+  def test_insert( self ):
+    action = renamer.ParseAction( 'i:hello world' )
+    self.assertEqual( ( 'insert', 0, 'hello world' ), action, "insert string generated an incorrect action" )
+
+    action = renamer.ParseAction( 'i:10:hello world' )
+    self.assertEqual( ( 'insert', 10, 'hello world' ), action, "insert position is incorrect" )
+
+    action = renamer.ParseAction( 'i:-10:hello world' )
+    self.assertEqual( ( 'insert', -10, 'hello world' ), action, "negative insert position is incorrect" )
+
+
+  def test_append( self ):
+    action = renamer.ParseAction( 'a:end' )
+    self.assertEqual( ( 'append', 'end' ), action )
+
+
+class TestDoAction( unittest.TestCase ):
+  def test_remove( self ):
+    action = ( 'remove', 'll' )
+    file   = 'hello world'
+
+    new_file = renamer.DoAction( action, file )
+    self.assertEqual( new_file, 'heo world' )
+
+
+  def test_replace( self ):
+    action = ( 'replace', 'll', '!!' )
+    file   = 'hello world'
+
+    new_file = renamer.DoAction( action, file )
+    self.assertEqual( new_file, 'he!!o world' )
+
+
+  def test_insert( self ):
+    action = ( 'insert', 1, 'HA' )
+    file   = 'hello world'
+
+    new_file = renamer.DoAction( action, file )
+    self.assertEqual( 'hHAello world', new_file )
+
+    action = ( 'insert', -1, 'HA' )
+    file   = 'hello world'
+
+    new_file = renamer.DoAction( action, file )
+    self.assertEqual( 'hello worlHAd', new_file, "negative insert position is wrongly changing the file name" )
+
+
+  def test_append( self ):
+    action = ( 'append', 'EOF' )
+    file   = 'hello world.ext'
+
+    new_file = renamer.DoAction( action, file )
+    self.assertEqual( 'hello worldEOF.ext', new_file )
+
+
+
 class TestGenerateRename( unittest.TestCase ):
   def test_order( self ):
     # should rename a-file.file to ile.file only if done in the correct order
@@ -149,23 +205,6 @@ class TestFilterRenames( unittest.TestCase ):
     ]
 
     self.assertEqual( renames, correct_renames )
-
-
-class TestDoAction( unittest.TestCase ):
-  def test_remove( self ):
-    action = ( 'remove', 'll' )
-    file   = 'hello world'
-
-    new_file = renamer.DoAction( action, file )
-    self.assertEqual( new_file, 'heo world' )
-
-
-  def test_replace( self ):
-    action = ( 'replace', 'll', '!!' )
-    file   = 'hello world'
-
-    new_file = renamer.DoAction( action, file )
-    self.assertEqual( new_file, 'he!!o world' )
 
 
 def Main():
