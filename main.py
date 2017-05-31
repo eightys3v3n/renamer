@@ -95,9 +95,12 @@ def ParseAction( raw ):
     action[0] = 'replace'
     raw = raw[2:]
 
-    # split the string with :
-    # do not split on a \:
+    # split the string with ':'
+    # do not split on '\:'
     res = re.split( '(?<!\\\):', raw )
+
+    if len(res) != 2:
+      raise Exception( "too many seperators ':'", raw )
 
     # replace all the \: with :
     # they had to be escaped in the command so as to not split in the wrong place
@@ -106,16 +109,22 @@ def ParseAction( raw ):
 
     action.extend( res )
 
+  # insert action
   elif raw[0:2] == 'i:':
     action[0] = 'insert'
     raw = raw[2:]
 
+    # split string with ':'
+    # do not split on '\:'
     res = re.split( '(?<!\\\):', raw )
 
+    # no position to insert at was specified
     if len(res) == 1:
       action.extend( [ 0, res[0] ] )
 
+    # a position to insert at was specified
     elif len(res) == 2:
+      # try to convert the position to an int
       try:
         i = int( res[0] )
       except ValueError:
@@ -183,12 +192,11 @@ def DoAction( action, file, partial=False ):
     if not partial and new_file == file:
       return None
 
-  # append new stuff at the end
+  # append new stuff at the end of the name, before the extension (if any)
   elif action[0] == 'append':
     ext_i = file.rfind( os.path.extsep )
     extension = ''
 
-    # append after the file name, before the extension
     if ext_i < 0:
       new_file = file
     else:
