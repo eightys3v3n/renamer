@@ -433,6 +433,8 @@ def Main():
 
 
   # get the files that will be worked with
+  if args == []:
+    args = ['.']
   files = fs.GetFiles( args, filter_re=filter_re, recursive=recursive )
   if len( files ) == 0:
     raise Exception( "no files found" )

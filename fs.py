@@ -50,7 +50,8 @@ def WalkDirectory( path, recursive=True ):
     return []
 
   for obj in objs:
-    obj = os.path.join( path, obj )
+    if path != '.':
+      obj = os.path.join( path, obj )
 
     if os.path.isfile( obj ):
       files.append( obj )
