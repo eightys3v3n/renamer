@@ -336,13 +336,14 @@ def PrintHelp( options ):
   Prints the help text
   """
   options = [
-    [ '-h' , '--help'    , "prints help text then exits." ]                                                    ,
-    [ '-v' , '--verbose' , "prints more verbose messages. a really long description that should be wrapped." ] ,
-    [ '-d' , '--dryrun'  , "prints what renames would happen without doing them." ]                            ,
-    [ '-f' , '--filter=' , "only works with files that match this regex." ]                                    ,
-    [ '-r' , '--result=' , "only performs renames that result in a file that matches this regex." ]            ,
-    [ '-a' , '--action=' , "add an action to be performed on file names. actions are done in the order they are specified. (see actions)" ],
-    [ '-p' , '--partial' , "allows for only some of the specified actions to be applied to file names" ],
+    [ '-h', '--help'     , "prints help text then exits." ],
+    [ '-v', '--verbose'  , "prints more verbose messages. a really long description that should be wrapped." ],
+    [ '-d', '--do'       , "actually renames files; does dry run by default." ],
+    [ '-f', '--filter='  , "only works with files that match this regex." ],
+    [ '-R', '--result='  , "only performs renames that result in a file that matches this regex." ],
+    [ '-a', '--action='  , "add an action to be performed on file names. actions are done in the order they are specified. (see actions)" ],
+    [ '-p', '--partial'  , "allows for only some of the specified actions to be applied to file names" ],
+    [ '-r', '--recursive', "scan directories recursively" ],
   ]
 
   AlignOptions( options )
@@ -373,7 +374,6 @@ def PrintHelp( options ):
 def Main():
   global verbose
 
-  print( "FIX HELP FUNCTION", file=sys.stderr )
   # parse the command line options and arguments
   options = {
     'short':'hvdf:R:a:pr',
