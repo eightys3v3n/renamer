@@ -7,6 +7,7 @@
 
 from getopt import getopt
 
+import file_finder
 import unittest
 import textwrap
 import shutil
@@ -23,49 +24,6 @@ global verbose, true, false
 true  = True
 false = False
 verbose = false
-
-
-def GetFiles( args, filter_re=None ):
-  """
-  Lists args that are files and match the filter expression.
-
-  args      | a list of file paths and possibly other junk. only files that exist are returned.
-  filter_re | a regular expression used to filter out args
-
-  Returns a list of the args that are existing files and that match filter_re.
-  """
-  global verbose
-  files   = []
-  Matches = None  # a function. returns True if file matches filter expression.
-
-  # sets the Matches function
-  if filter_re is not None:
-    filter = filter_re
-    def Matches( pattern, source ):
-      if re.match( pattern, source ):
-        return True
-      else:
-        return False
-
-  else:
-    def Matches( pattern, source ):
-      return True
-
-  # searches through the args for files that match the filter expression
-  for arg in args:
-
-    # if file exists
-    if os.path.isfile( arg ):
-
-      # if it matches the filter expression
-      if Matches( filter_re, arg ):
-        files.append( arg )
-      elif verbose:
-        print( "file doesn't match filter '{}'".format( arg ) )
-    elif verbose:
-      print( "file doesn't exist '{}'".format( arg ) )
-
-  return files
 
 
 def ParseAction( raw ):
@@ -372,7 +330,7 @@ def PrintOptions( options ):
     print( option[0] + option[1] + option[2] )
 
 
-def PrintHelp():
+def PrintHelp( options ):
   """
   Prints the help text
   """
@@ -395,6 +353,8 @@ def PrintHelp():
   print( "\nActions:" )
   print( "  d:regex          | removes all occurances of regex.")
   print( "  r:regex1:regex2  | replaces all occurances of regex1 with regex2.")
+  print( "  i:position:text  | inserts text at position. negative position starts from the end.")
+  print( "  a:text           | appends text to the end of the name, before the extension.")
 
   print( "\nExample:" )
   print( "Files:" )
@@ -412,19 +372,34 @@ def PrintHelp():
 def Main():
   global verbose
 
+  print( "FIX HELP FUNCTION", file=sys.stderr )
   # parse the command line options and arguments
-  opts, args = getopt( sys.argv[1:], 'hvdf:r:a:p', [ 'help', 'verbose', 'dryrun', 'filter=', 'result=', 'action=', 'partial' ] )
-  filter_re  = None
+  options = {
+    'short':'hvdf:R:a:ps',
+    'long' :[
+      'help',
+      'verbose',
+      'dryrun',
+      'filter=',
+      'result=',
+      'action=',
+      'partial',
+      'specific',
+    ],
+  }
+  opts, args = getopt( sys.argv[1:], options['short'], options['long'] )
   actions    = []
-  dryrun     = False
+  filter_re  = None
   result_re  = None
   command    = None
-  partial    = False
+  partial        = False
+  dryrun         = False
+  specific_files = False
 
   # parse command line arguments
   for opt, arg in opts:
     if opt in [ '-h', '--help' ]:
-      PrintHelp()
+      PrintHelp(options)
       exit(0)
 
     elif opt in [ '-v', '--verbose' ]:
@@ -440,7 +415,7 @@ def Main():
       if verbose:
         print( "file filter '{}'".format( filter_re ) )
 
-    elif opt in [ '-r', '--result' ]:
+    elif opt in [ '-R', '--result' ]:
       result_re = arg
       if verbose:
         print( "resulting names must match '{}'".format( result_re ) )
@@ -452,11 +427,16 @@ def Main():
     elif opt in [ '-p', '--partial' ]:
       partial = True
 
+    elif opt in [ '-s', '--specific' ]:
+      specific_files = True
+
+    elif opt
+
 
   # get the files that will be worked with
-  files   = GetFiles( args, filter_re=filter_re )
+  files = GetFiles( args, specific=specific_files, filter_re=filter_re, recursive=recursive )
   if len( files ) == 0:
-    raise Exception( "no files specified" )
+    raise Exception( "no files found" )
 
 
   # print errors if required arguments are missing
