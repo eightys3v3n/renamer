@@ -1,13 +1,11 @@
 #!/bin/python3
 
+"""
+Written by Terrence = eightys3v3n@gmail.com
+"""
 
-"""
-  Written by Terrence = eightys3v3n@gmail.com
-"""
 
 from getopt import getopt
-
-import file_finder
 import unittest
 import textwrap
 import shutil
@@ -15,9 +13,12 @@ import sys
 import os
 import re
 
-sys.path.append( '/data/source/db' )
+# appends the path of the script to the path environment
+# this allows the script to be run from working directories other than where it is
+sys.path.append( os.path.dirname( os.path.abspath( __file__ ) ) )
 
 import keyword_replacer
+import fs
 
 
 global verbose, true, false
@@ -375,16 +376,16 @@ def Main():
   print( "FIX HELP FUNCTION", file=sys.stderr )
   # parse the command line options and arguments
   options = {
-    'short':'hvdf:R:a:ps',
+    'short':'hvdf:R:a:pr',
     'long' :[
       'help',
       'verbose',
-      'dryrun',
+      'do',
       'filter=',
       'result=',
       'action=',
       'partial',
-      'specific',
+      'recursive',
     ],
   }
   opts, args = getopt( sys.argv[1:], options['short'], options['long'] )
@@ -392,9 +393,10 @@ def Main():
   filter_re  = None
   result_re  = None
   command    = None
-  partial        = False
-  dryrun         = False
   specific_files = False
+  recursive      = False
+  partial        = False
+  dryrun         = True
 
   # parse command line arguments
   for opt, arg in opts:
@@ -406,9 +408,8 @@ def Main():
       verbose = true
       print( "verbose mode" )
 
-    elif opt in [ '-d', '--dryrun' ]:
-      dryrun = True
-      print( "dryrun mode" )
+    elif opt in [ '-d', '--do' ]:
+      dryrun = False
 
     elif opt in [ '-f', '--filter' ]:
       filter_re = arg
@@ -427,14 +428,12 @@ def Main():
     elif opt in [ '-p', '--partial' ]:
       partial = True
 
-    elif opt in [ '-s', '--specific' ]:
-      specific_files = True
-
-    elif opt
+    elif opt in [ '-r', '--recursive' ]:
+      recursive = True
 
 
   # get the files that will be worked with
-  files = GetFiles( args, specific=specific_files, filter_re=filter_re, recursive=recursive )
+  files = fs.GetFiles( args, filter_re=filter_re, recursive=recursive )
   if len( files ) == 0:
     raise Exception( "no files found" )
 
