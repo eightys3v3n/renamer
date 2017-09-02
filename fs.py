@@ -92,7 +92,7 @@ def FilterFiles( files, filter ):
 
   for file in files:
     if re.match( filter, file ):
-      new_files.append( arg )
+      new_files.append( file )
 
     elif verbose:
       print( "file doesn't match filter '{}'".format( arg ) )

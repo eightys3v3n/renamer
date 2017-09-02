@@ -1,7 +1,7 @@
 #!/bin/python3
 
 """
-Written by Terrence = eightys3v3n@gmail.com
+Written by Terrence, eightys3v3n@gmail.com
 """
 
 
@@ -357,6 +357,8 @@ def PrintHelp( options ):
   print( "  r:regex1:regex2  | replaces all occurances of regex1 with regex2.")
   print( "  i:position:text  | inserts text at position. negative position starts from the end.")
   print( "  a:text           | appends text to the end of the name, before the extension.")
+  print( "\nReplacements:" )
+  print( "  %res  | replaced with WIDTHxHEIGHT of the video" )
 
   print( "\nExample:" )
   print( "Files:" )
@@ -432,6 +434,8 @@ def Main():
       recursive = True
 
 
+  if verbose:
+    print( "getting files" )
   # get the files that will be worked with
   if args == []:
     args = ['.']
@@ -452,10 +456,17 @@ def Main():
       print( "  "+file )
 
 
+  if verbose:
+    print( "generating renames" )
   # generate a list of ( original_file_name, new_file_name )
   renames = GenerateRenames( actions, files, partial=partial )
 
+  if verbose:
+    print( "sorting renames" )
+  renames.sort()
 
+  if verbose:
+    print( "filtering renames" )
   # filter out renames whose new_file_name doesn't match the result expression
   if result_re is not None:
     renames = FilterRenames( renames, result_re )
@@ -465,6 +476,8 @@ def Main():
       print( "{} -> {}".format( rename[0], rename[1] ) )
 
   else:
+    if verbose:
+      print( "doing renames" )
     # actually rename all the files
     DoRenames( renames )
 
