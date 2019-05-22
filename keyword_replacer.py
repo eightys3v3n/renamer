@@ -34,3 +34,6 @@ def ReplaceKeyWords( new_file, file ):
     new_file = new_file.replace( '%res', res )
 
   return new_file
+
+# command for title/artist
+# ffprobe /data/music/Savior\ -\ Rise\ Against.mp3 2>&1| egrep "title\s+:\s+[a-zA-Z0-9 ]+"

@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 
 """
 Written by Terrence, eightys3v3n@gmail.com
