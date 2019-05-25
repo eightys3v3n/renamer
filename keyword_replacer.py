@@ -2,12 +2,14 @@
 
 
 import subprocess
+import unittest
 import re
+import os
+from collections import defaultdict
 
 
 def VideoResolution( path ):
-  """
-  Returns the resolution of a file as detected by ffprobe
+  """ Returns the resolution of a file, 'XxY', as detected by ffprobe
   """
   p = subprocess.Popen( ['ffprobe',path], stderr=subprocess.PIPE )
 
@@ -23,17 +25,56 @@ def VideoResolution( path ):
 
   # make it x,y instead of y,x
   ret.reverse()
+  ret = 'x'.join(ret)
 
   return ret
 
 
+def SongTitle( path ):
+  """ Returns the title of a music file as detected by ffprobe
+  """
+  p = subprocess.Popen( ['ffprobe',path], stderr=subprocess.PIPE )
+
+  output = p.communicate()[1].decode()
+  if 'Invalid data found' in output:
+    return None
+
+  # find the first occurance of "title : stuff" with any number of spaces.
+  res = re.search( r'title\s+:\s+([a-zA-Z0-9,\(\) ]+)', output )
+
+  if res is None:
+    return ""
+
+  ret = res.group(1)
+
+  return ret
+
+
+KEYWORD_PREFIX = '%'
+KEYWORDS = {
+  'res': VideoResolution,
+  'title': SongTitle,
+}
+
+
 def ReplaceKeyWords( new_file, file ):
-  if '%res' in new_file:
-    res = VideoResolution( file )
-    res = 'x'.join(res)
-    new_file = new_file.replace( '%res', res )
+  for keyword, func in KEYWORDS.items():
+    trigger_word = f'{KEYWORD_PREFIX}{keyword}'
+    if trigger_word in new_file:
+      res = func( file )
+      new_file = new_file.replace( trigger_word, res)
 
   return new_file
 
-# command for title/artist
-# ffprobe /data/music/Savior\ -\ Rise\ Against.mp3 2>&1| egrep "title\s+:\s+[a-zA-Z0-9 ]+"
+
+class Test(unittest.TestCase):
+  SONG_TITLE_FILE = "tests/test_song.mp3"
+
+  @classmethod
+  def setUpClass(cls):
+    if not os.path.exists(cls.SONG_TITLE_FILE):
+      raise Exception(f"Missing test file '{cls.SONG_TITLE_FILE}'")
+
+  def test_song_title(self):
+    res = SongTitle(self.SONG_TITLE_FILE)
+    self.assertEqual("Example Title", res)
