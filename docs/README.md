@@ -61,3 +61,7 @@ rename -f 'series_name episode.*' -r 'Series Name.*\.mp4' -a 'r:series_name:Seri
 -r files can only be renamed to something matching this regex
 -a an action to do on all the file names. In this case it is replacing series_name with Series Name.
 ```
+
+### Todo:
+  * Add image taken date keyword.
+
