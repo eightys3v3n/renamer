@@ -124,7 +124,7 @@ def PrintHelp( options ):
   print( "   'dexter episode 2 [random crap].mp4'")
   print( "   'dexter episode 3 [random crap].mp4'")
   print( "   'other show episode 1.mp4'")
-  print( "\nrename -f 'dexter episode [0-9] \[.*\].mp4' -r 'Dexter E[0-9].mp4' -a 'r:dexter episode ([0-9]) .*:Dexter E\\1.mp4' *")
+  print( "\nrename -f 'dexter episode [0-9] \[.*\].mp4' -R 'Dexter E[0-9].mp4' -a 'r:dexter episode ([0-9]) .*:Dexter E\\1.mp4' *")
   print( "\nRenamed files:")
   print( "   'Dexter E1.mp4'")
   print( "   'Dexter E2.mp4'")

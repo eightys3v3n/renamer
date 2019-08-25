@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import unittest
 
 
 global verbose
@@ -13,6 +14,8 @@ except NameError:
 def ValidPaths( paths ):
   global verbose
   valid = []
+
+  assert isinstance( paths, (list, tuple) )
 
   # searches through the args for files that match the filter expression
   for path in paths:
@@ -42,11 +45,14 @@ def WalkDirectory( path, recursive=True ):
   if os.path.isfile( path ):
     return [ path ]
 
+  if verbose:
+    print( "Walking directory: '{}'".format( path ), file=sys.stderr )
+
   try:
     objs = os.listdir( path )
 
   except PermissionError:
-    print( "Permission Denied '{}'".format( path ))
+    print( "Permission Denied '{}'".format( path ), file=sys.stderr )
     return []
 
   for obj in objs:
@@ -58,6 +64,12 @@ def WalkDirectory( path, recursive=True ):
 
       if verbose:
         print( "file '{}'".format( obj ), file=sys.stderr )
+
+    elif os.path.islink( obj ):
+      files.append( obj )
+
+      if verbose:
+        print("link file '{}'".format( obj ), file=sys.stderr )
 
     elif os.path.isdir( obj ) and recursive:
       files.extend( WalkDirectory( obj ) )
@@ -111,10 +123,36 @@ def GetFiles( args, filter_re=None, recursive=False ):
   """
   global verbose
 
+  if not isinstance(args, (tuple, list)):
+    args = (args, )
+
+  if verbose:
+    print("Args: '{}'", args, file=sys.stderr )
+
   paths = ValidPaths( args )
+  if verbose:
+    print("Valid paths in arguments:\n", paths, file=sys.stderr )
+
   paths = ListFiles( args, recursive=recursive )
 
   if filter_re is not None:
     paths = FilterFiles( paths, filter_re )
 
   return paths
+
+
+class TestGetFiles(unittest.TestCase):
+  def test_recursive(self):
+    # Assert that there are more than 5 files in the parent directory.
+    # This is used to ensure that recursive mode is actually traversing directories.
+    self.assertTrue(len(GetFiles("../tests", recursive=True)) > len(GetFiles("../tests", recursive=False)))
+
+
+class TestFilterFiles(unittest.TestCase):
+  def test_filter(self):
+    files = [
+      'file_one.jpeg',
+      'file_two.jpeg',
+      'file_three.jpg',
+      ]
+    self.assertTrue(len(FilterFiles(files, '[a-z_]+\.jpeg')) == 2)
