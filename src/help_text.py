@@ -95,6 +95,7 @@ def PrintHelp( options ):
     [ '-a', '--action='  , "add an action to be performed on file names. actions are done in the order they are specified. (see actions)" ],
     [ '-p', '--partial'  , "allows for only some of the specified actions to be applied to file names" ],
     [ '-r', '--recursive', "scan directories recursively" ],
+	[ '-o', '--overwrite', "overwrite files if the destination file name already exists" ],
   ]
   replacements = []
   for keyword, func in keyword_replacer.KEYWORDS.items():
