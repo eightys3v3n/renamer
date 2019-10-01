@@ -192,7 +192,7 @@ def GenerateRename( actions, file, partial=False ):
   return ( file, new_file )
 
 
-def GenerateRenames( actions, files, partial=False ):
+def GenerateRenames( actions, files, partial=False, overwrite=False ):
   """
   Performs a list of actions on a list of file names.
 
@@ -218,6 +218,10 @@ def GenerateRenames( actions, files, partial=False ):
         # if a file with the new name already exists, warn and skip this file
         if not os.path.exists( rename[1] ):
           renames.append( rename )
+
+        elif overwrite:
+          renames.append( rename )
+          print( "file being overwritten '{}'".format( rename[1] ) )
 
         elif verbose:
           print( "file already exists '{}', dropping".format( rename[1] ) )
@@ -276,7 +280,7 @@ def Main():
 
   # parse the command line options and arguments
   options = {
-    'short':'hvdf:R:a:pr',
+    'short':'hvdf:R:a:pro',
     'long' :[
       'help',
       'verbose',
@@ -286,6 +290,7 @@ def Main():
       'action=',
       'partial',
       'recursive',
+      'overwrite',
     ],
   }
   opts, args = getopt( sys.argv[1:], options['short'], options['long'] )
@@ -296,6 +301,7 @@ def Main():
   specific_files = False
   recursive      = False
   partial        = False
+  overwrite      = False
   dryrun         = True
 
   # parse command line arguments
@@ -331,6 +337,9 @@ def Main():
     elif opt in [ '-r', '--recursive' ]:
       recursive = True
 
+    elif opt in [ '-o', '--overwrite' ]:
+      overwrite = True
+
 
   if verbose:
     print( "getting files" )
@@ -357,7 +366,7 @@ def Main():
   if verbose:
     print( "generating renames" )
   # generate a list of ( original_file_name, new_file_name )
-  renames = GenerateRenames( actions, files, partial=partial )
+  renames = GenerateRenames( actions, files, partial=partial, overwrite=overwrite )
 
   if verbose:
     print( "sorting renames" )
